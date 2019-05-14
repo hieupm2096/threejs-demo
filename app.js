@@ -27,6 +27,11 @@ function init() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xf0f0f0);
 
+    // add light, MeshLambertMaterial cannot show color if no light
+    var light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(1, 1, 1).normalize();
+    scene.add(light);
+
     // adding cube
     var geometry = new THREE.CubeGeometry(300, 200, 200);
 
@@ -45,7 +50,9 @@ function init() {
     mesh.add(line);
 
     var geometry_child = new THREE.BoxBufferGeometry(100, 100, 100);
-    var material_child = new THREE.MeshLambertMaterial();
+    var material_child = new THREE.MeshLambertMaterial({
+        color: 0xba5ced,
+    });
     var mesh_child = new THREE.Mesh(geometry_child, material_child);
     mesh_child.position.set(0, 0, 0);
 
