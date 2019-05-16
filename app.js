@@ -2,12 +2,11 @@ var WIDTH = 640,
     HEIGHT = 360;
 
 var camera, controls, scene, renderer, dragControls;
-var dragItem, dragItemBoxHelper, dragItemBox3;
+var dragItem, dragItemBoxHelper, dragItemBox3, dragItemOldPos;
 var startColor;
 var mouse = new THREE.Vector2();
-var collidableMesh = [];
+var collidableBox = [];
 var cubes = [];
-var walls = [];
 
 init();
 animate();
@@ -93,12 +92,58 @@ function init() {
         color: 0xffffff,
     });
     var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+    cube.name = "cube";
     cube.position.set(0, 50, 0);
-    console.log(cube.position);
 
-    collidableMesh.push(cube);
     cubes.push(cube);
     scene.add(cube);
+
+    var cubeBoxHelper = new THREE.BoxHelper(cube, 0x000000);
+    cubeBoxHelper.visible = false;
+    scene.add(cubeBoxHelper);
+
+    var cubeBox3 = new THREE.Box3();
+    cubeBox3.setFromObject(cubeBoxHelper);
+    cubeBox3.name = cube.name;
+    collidableBox.push(cubeBox3);
+
+    // cube 1
+    var cubeMaterial1 = new THREE.MeshLambertMaterial({
+        color: 0xffffff,
+    });
+    var cube1 = new THREE.Mesh(cubeGeometry, cubeMaterial1);
+    cube1.name = "cube1";
+    cube1.position.set(-150, 50, -250);
+    cubes.push(cube1);
+    scene.add(cube1);
+
+    var cube1BoxHelper = new THREE.BoxHelper(cube1, 0x000000);
+    cube1BoxHelper.visible = false;
+    scene.add(cube1BoxHelper);
+
+    var cube1Box3 = new THREE.Box3();
+    cube1Box3.setFromObject(cube1BoxHelper);
+    cube1Box3.name = cube1.name;
+    collidableBox.push(cube1Box3);
+
+    // cube 2
+    var cubeMaterial2 = new THREE.MeshLambertMaterial({
+        color: 0xffffff,
+    });
+    var cube2 = new THREE.Mesh(cubeGeometry, cubeMaterial2);
+    cube2.name = "cube2";
+    cube2.position.set(-150, 50, 250);
+    cubes.push(cube2);
+    scene.add(cube2);
+
+    var cube2BoxHelper = new THREE.BoxHelper(cube2, 0x000000);
+    cube2BoxHelper.visible = false;
+    scene.add(cube2BoxHelper);
+
+    var cube2Box3 = new THREE.Box3();
+    cube2Box3.setFromObject(cube2BoxHelper);
+    cube2Box3.name = cube2.name;
+    collidableBox.push(cube2Box3);
 
     // init renderer
     renderer = new THREE.WebGLRenderer({
@@ -153,11 +198,22 @@ function render() {
 function onDragStart(event) {
     controls.enabled = false;
     dragItem = event.object;
+
+    dragItemOldPos = dragItem.position;
+
     dragItemBoxHelper = new THREE.BoxHelper(dragItem, 0xff0000);
+
     scene.add(dragItemBoxHelper);
 
     dragItemBox3 = new THREE.Box3();
     dragItemBox3.setFromObject(dragItemBoxHelper);
+    dragItemBox3.name = dragItem.name;
+
+    cubes.forEach((cube, index) => {
+        if (cube.name != dragItem.name) {
+            cube.material.opacity = 0.5;
+        }
+    });
 }
 
 function onDrag(event) {
@@ -180,6 +236,14 @@ function onDrag(event) {
 
     dragItemBoxHelper.update();
     dragItemBox3.setFromObject(dragItemBoxHelper);
+
+    collidableBox.forEach((box, index) => {
+        if (box.name != dragItemBox3.name) {
+            if (box.intersectsBox(dragItemBox3)) {
+                console.log('true');
+            }
+        }
+    })
     // for (const wall of walls) {
     //     if (dragItemBox3.intersectsBox(wall.box3)) {
     //         // dragItem.position.set(dragItem.position.x, 50, dragItem.position.z);
@@ -200,8 +264,12 @@ function onDrag(event) {
 }
 
 function onDragEnd(event) {
-    console.log(dragItem.position);
     controls.enabled = true;
+    cubes.forEach((cube, index) => {
+        if (cube.name != dragItem.name) {
+            cube.material.opacity = 1;
+        }
+    });
     dragItem = undefined;
     scene.remove(dragItemBoxHelper);
     dragItemBoxHelper = undefined;
