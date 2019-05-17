@@ -4,7 +4,6 @@ var WIDTH = 640,
 var camera, controls, scene, renderer, dragControls;
 var dragItem, dragItemBoxHelper, dragItemBox3, dragItemOldPos;
 var startColor;
-var mouse = new THREE.Vector2();
 var collidableBox = [];
 var cubes = [];
 
@@ -21,7 +20,7 @@ function init() {
     scene.background = new THREE.Color(0xf0f0f0);
 
     // init floor, ceiling and walls: floor and ceiling: 400 * 400 * 600 (w * h * l)
-    var floor = new THREE.Mesh(new THREE.PlaneGeometry(400, 600), new THREE.MeshBasicMaterial());
+    var floor = new THREE.Mesh(new THREE.PlaneBufferGeometry(400, 600, 100, 100), new THREE.MeshBasicMaterial());
     floor.rotation.x = Math.PI / 2;
     scene.add(floor);
 
@@ -29,7 +28,7 @@ function init() {
     var floorBoxHelper = new THREE.BoxHelper(floor, 0xff0000);
     scene.add(floorBoxHelper);
 
-    var ceiling = new THREE.Mesh(new THREE.PlaneGeometry(400, 600), new THREE.MeshBasicMaterial({
+    var ceiling = new THREE.Mesh(new THREE.PlaneBufferGeometry(400, 600), new THREE.MeshBasicMaterial({
         transparent: true,
         opacity: 0
     }));
@@ -41,7 +40,7 @@ function init() {
     var ceilingBoxHelper = new THREE.BoxHelper(ceiling, 0xff0000);
     scene.add(ceilingBoxHelper);
 
-    var leftWall = new THREE.Mesh(new THREE.PlaneGeometry(400, 200), new THREE.MeshBasicMaterial({
+    var leftWall = new THREE.Mesh(new THREE.PlaneBufferGeometry(400, 200), new THREE.MeshBasicMaterial({
         transparent: true,
         opacity: 0
     }));
@@ -53,7 +52,7 @@ function init() {
     scene.add(leftWallBoxHelper);
 
     // right wall
-    var rightWall = new THREE.Mesh(new THREE.PlaneGeometry(400, 200), new THREE.MeshBasicMaterial({
+    var rightWall = new THREE.Mesh(new THREE.PlaneBufferGeometry(400, 200), new THREE.MeshBasicMaterial({
         transparent: true,
         opacity: 0
     }));
